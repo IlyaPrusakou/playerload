@@ -42,7 +42,7 @@ namespace Audioplayer
             player.Items[0].playlists.Add(new Playlist { title = "kuku" });
             player.Items[0].playlists.Add(new Playlist { title = "gaga" });
             //все отлично работает//
-            player.Save(@"D:\ДЗ\playerload\audio"); // работает как надо//
+            player.SavePlaylist(@"D:\ДЗ\playerload\audio"); // работает как надо//
             Console.WriteLine(player.Items.Count); // show 25//
             player.Clear();
 

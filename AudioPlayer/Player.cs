@@ -13,49 +13,87 @@ namespace Audioplayer
 {
     public class Player: GenericPlayer<Song>  
     {
-
-        public Player(Skin skn) : base(skn) 
+        public Player()
         {
 
         }
-        private FileInfo[] GetWav(string directoryPath) //AL6-Player1/2-AudioFiles.//
+
+        public Player(Skin skn)
+        {
+        SkinForm = skn;
+        }
+        private FileInfo[] GetWav(string directoryPath, string pattern = null) //AL6-Player1/2-AudioFiles.//
         {
             DirectoryInfo dir = new DirectoryInfo(directoryPath); //AL6-Player1/2-AudioFiles.//
-            FileInfo[] files = dir.GetFiles();  //AL6-Player1/2-AudioFiles.//
+            FileInfo[] files = null;
+            if (pattern == null) { files = dir.GetFiles(); }
+            else if (pattern != null) { files = dir.GetFiles(pattern); }
             return files; //AL6-Player1/2-AudioFiles.//
         }
-        private byte[] CreateByteFromWav(long lengtOfStream) //AL6-Player1/2-AudioFiles.// 
-        {
-            byte[] bytemass = new byte[lengtOfStream];  //AL6-Player1/2-AudioFiles.//
-            return bytemass; //AL6-Player1/2-AudioFiles.//
-        }
-        public void Load(string directoryPath) //AL6-Player1/2-AudioFiles.//
+         public override void Load(string directoryPath) //AL6-Player1/2-AudioFiles.//
         {
             List<Song> listOfLoadedSongs = new List<Song>(); //AL6-Player1/2-AudioFiles.//
             FileInfo[] files = GetWav(directoryPath); //AL6-Player1/2-AudioFiles.//
             foreach (FileInfo item in files) //AL6-Player1/2-AudioFiles.//
             {
-
                 Song itemSong = new Song();  //AL6-Player1/2-AudioFiles.//
-                try
-                {
-                    using (FileStream fs = new FileStream(item.FullName, FileMode.Open)) //AL6-Player1/2-AudioFiles.
-                    {
-                        byte[] bytemass = CreateByteFromWav(fs.Length);  //AL6-Player1/2-AudioFiles.//
-                        int len = Convert.ToInt32(bytemass.Length); //AL6-Player1/2-AudioFiles.//
-                        fs.Read(bytemass, 0, len); //AL6-Player1/2-AudioFiles.//
-                        itemSong.ItemByteData = bytemass; //AL6-Player1/2-AudioFiles.//
-                    }
-                }
-                catch (FileNotFoundException) //AL6-Player1/2-AudioFiles.//
-                {
-                    Console.WriteLine("File has not found"); //AL6-Player1/2-AudioFiles.//
-                }
-                if (itemSong.ItemByteData.Length > 0) { listOfLoadedSongs.Add(itemSong); } //AL6-Player1/2-AudioFiles.
+                itemSong.Path = item.FullName;
+                listOfLoadedSongs.Add(itemSong); 
             }
-            Items = listOfLoadedSongs; //AL6-Player1/2-AudioFiles.//
+            Items = listOfLoadedSongs; 
         }
+        public override void Clear()
+        {
+            List<Song> emptyList = new List<Song>(); 
+            Items = emptyList; 
+        }
+        private void SerializeClass(Song item, string filepath, XmlSerializer xs, XmlWriterSettings set) //AL6-Player2/2-PlaylistSrlz.
+        {
+            using (FileStream fs = File.Create(filepath))//AL6-Player2/2-PlaylistSrlz.//
+            {
+                using (XmlWriter str = XmlWriter.Create(fs, set))//AL6-Player2/2-PlaylistSrlz.
+                {
+                    xs.Serialize(str, item);//AL6-Player2/2-PlaylistSrlz.//
+                }
+            }
+        }
+        public override void SavePlaylist(string directory) //AL6-Player2/2-PlaylistSrlz.//
+        {
+            XmlSerializer xs = new XmlSerializer(typeof(Song)); //AL6-Player2/2-PlaylistSrlz.//
+            XmlWriterSettings set = new XmlWriterSettings(); //AL6-Player2/2-PlaylistSrlz.//
+            set.Indent = true; //AL6-Player2/2-PlaylistSrlz.//
+            foreach (Song item in Items) //AL6-Player2/2-PlaylistSrlz.//
+            {
+                string filepath = directory + @"\" + item.Title + ".xml"; //AL6-Player2/2-PlaylistSrlz.//
+                SerializeClass(item, filepath, xs, set); //AL6-Player2/2-PlaylistSrlz.//
+            }
+        }
+        private Song DeserializeClass(FileInfo file, XmlSerializer xs) //AL6-Player2/2-PlaylistSrlz.//
+        {
+            Song song; //AL6-Player2/2-PlaylistSrlz.
+            using (FileStream fs = new FileStream(file.FullName, FileMode.Open)) //AL6-Player2/2-PlaylistSrlz.
+            {
+                using (XmlReader rdr = XmlReader.Create(fs)) //AL6-Player2/2-PlaylistSrlz.//
+                {
+                    song = (Song)xs.Deserialize(rdr); //AL6-Player2/2-PlaylistSrlz.//
+                }
+            }
+            return song; //AL6-Player2/2-PlaylistSrlz.//
+        }
+        public override void LoadPlayList(string directoryPath, string pattern = null) //AL6-Player2/2-PlaylistSrlz.//
+        {
 
+            XmlSerializer xs = new XmlSerializer(typeof(Song)); //AL6-Player2/2-PlaylistSrlz.//
+            FileInfo[] files = GetWav(directoryPath, pattern);
+            List<Song> listOfLoadedSongs = new List<Song>(); //AL6-Player2/2-PlaylistSrlz.
+            Song song = null; //AL6-Player2/2-PlaylistSrlz.//
+            foreach (FileInfo item in files) //AL6-Player2/2-PlaylistSrlz.//
+            {
+                song = DeserializeClass(item, xs); //AL6-Player2/2-PlaylistSrlz.//
+                listOfLoadedSongs.Add(song); //AL6-Player2/2-PlaylistSrlz.//
+            }
+            Items = listOfLoadedSongs; //AL6-Player2/2-PlaylistSrlz.//
+        }
         public void LyricsOutput() 
         {
             foreach (Song item in Items) 

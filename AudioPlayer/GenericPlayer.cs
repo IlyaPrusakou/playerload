@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace AudioPlayer
 {
-    public class GenericPlayer<T>  where T: ItemPlaying // GenericPlayerHomework 
+    public abstract class GenericPlayer<T>  where T: ItemPlaying // GenericPlayerHomework 
     {
         private int volume;
         private bool playing;
@@ -20,15 +20,15 @@ namespace AudioPlayer
         public List<T> Items { get; set; } // GenericPlayerHomework
         public Random Rnd { get; set; } = new Random();
         public Skin SkinForm { get; set; }
-        public GenericPlayer()
-        {
+        //public GenericPlayer()
+        //{
 
-        }
+        //}
 
-        public GenericPlayer(Skin skn)
-        {
-            SkinForm = skn;
-        }
+        //public GenericPlayer(Skin skn)
+        //{
+            //SkinForm = skn;
+        //}
         public bool Playing
         {
             get
@@ -60,14 +60,14 @@ namespace AudioPlayer
             }
 
         }
-        public void ParametrSong(params T[] itemList) // GenericPlayerHomework
+        public void ParametrSong(params T[] itemList) 
         {
             foreach (T item in itemList)
             {
                 SkinForm.Render(item.Title); 
             }
         }
-        public (string Title, bool IsNext, (int Sec, int Min, int Hour)) GetItemData(T item)  // GenericPlayerHomework
+        public (string Title, bool IsNext, (int Sec, int Min, int Hour)) GetItemData(T item)  
         {
             var (str, boo, sec, min, hour) = item;
             string s = str;
@@ -77,7 +77,7 @@ namespace AudioPlayer
             int f2 = hour;
             return (Title: s, IsNext: d, (Sec: f, Min: f1, Hour: f2));
         }
-        public void ListItem(List<T> list) // GenericPlayerHomework
+        public void ListItem(List<T> list) 
         {
             foreach (T item in list)
             {
@@ -91,7 +91,7 @@ namespace AudioPlayer
             }
         }
 
-        public List<T> FilterByGenres(List<T> items, Genres genre)  // GenericPlayerHomework
+        public List<T> FilterByGenres(List<T> items, Genres genre) 
         {
             List<T> FilterdList = new List<T>();
             IEnumerable<T> selectedItems = from t in items
@@ -183,114 +183,12 @@ namespace AudioPlayer
                 }
             }
         }
-        // Комментарий: я хотел сделать метод load обобщенным, но надо создавать песню T song = new T(), 
-        //следовательно надо делать ограничение для типа Т new(). Но тип Т имеет ограничение на конкретный тип
-        // ItemPlaying(это Абстарктный тип и не может иметь конструктор без параметров).//
-        // Следовательно я отправил метод load в класс Song: ItemPlaying
-        // (то есть разделил логику, выглядит неуклюже).//
-        // Можно было сделать класс ItemPlaying не абстрактным, но это противоречит нашим предыдущим заданиям.
-        // Можно в классе GenericPlayer<Т> оставить из метода load загрузку байтмассива и в класс
-        // Player: GenericPlayer<Song> создать метод CreateSong, внутри которого вызывать метода Load.
-        // Ниже привожу обобщенный вариант метода Load. Обратите внимание на строчку 213//
-        //private FileInfo[] GetWav(string directoryPath)
-        //{
-        //DirectoryInfo dir = new DirectoryInfo(directoryPath);
-        //FileInfo[] files = dir.GetFiles();
-        //return files;
-        //}
-        //private byte[] CreateByteFromWav(long lengtOfStream)
-        //{
-        //byte[] bytemass = new byte[lengtOfStream];
-        //return bytemass;
-        //}
-        //public void Load(string directoryPath)
-        //{
-        //List<T> listOfLoadedSongs = new List<T>();
-        //FileInfo[] files = GetWav(directoryPath);
-        //foreach (FileInfo item in files)
-        //{
+        public abstract void Load(string dirpath);
+        public abstract void Clear();
 
-        //T itemSong = new T(); ЗДЕСЬ НУЖНО ВВОДИТЬ ОГРАНИЧЕНИЕ НА NEW()!!!
-        //try
-        //{
-        //using (FileStream fs = new FileStream(item.FullName, FileMode.Open))
-        //{
-        //byte[] bytemass = CreateByteFromWav(fs.Length);
-        //int len = Convert.ToInt32(bytemass.Length);
-        //fs.Read(bytemass, 0, len);
-        //itemSong.ItemByteData = bytemass;
-        //}
-        //}
-        //catch (FileNotFoundException)
-        //{
-        // Console.WriteLine("File has not found");
-        //}
-        //if (itemSong.ItemByteData.Length > 0) { listOfLoadedSongs.Add(itemSong); }
-        //}
-        //Items = listOfLoadedSongs;
-        //}//
-        public void Clear() //AL6-Player1/2-AudioFiles.//
-        {
-            List<T> emptyList = new List<T>(); //AL6-Player1/2-AudioFiles.//
-            Items = emptyList; //AL6-Player1/2-AudioFiles.//
-        }
-        private void SerializeClass(T item, string filepath, XmlSerializer xs, XmlWriterSettings set) //AL6-Player2/2-PlaylistSrlz.
-        {
-            using (FileStream fs = File.Create(filepath))//AL6-Player2/2-PlaylistSrlz.//
-            {
-                     using (XmlWriter str =  XmlWriter.Create(fs, set))//AL6-Player2/2-PlaylistSrlz.
-                {
-                        xs.Serialize(str, item);//AL6-Player2/2-PlaylistSrlz.//
-                }
-            }
-        }
-        
-        public void Save(string directory) //AL6-Player2/2-PlaylistSrlz.//
-        {
-            XmlSerializer xs = new XmlSerializer(typeof(T)); //AL6-Player2/2-PlaylistSrlz.//
-            XmlWriterSettings set = new XmlWriterSettings(); //AL6-Player2/2-PlaylistSrlz.//
-            set.Indent = true; //AL6-Player2/2-PlaylistSrlz.//
-            foreach (T item in Items) //AL6-Player2/2-PlaylistSrlz.//
-            {
-                string filepath = directory + @"\" + item.Title + ".xml"; //AL6-Player2/2-PlaylistSrlz.//
-                SerializeClass(item, filepath, xs, set); //AL6-Player2/2-PlaylistSrlz.//
-            }
-        }
-        private T DeserializeClass(FileInfo file, XmlSerializer xs) //AL6-Player2/2-PlaylistSrlz.//
-        {
-            T song; //AL6-Player2/2-PlaylistSrlz.
-            using (FileStream fs = new FileStream(file.FullName, FileMode.Open)) //AL6-Player2/2-PlaylistSrlz.
-            {
-                using (XmlReader rdr = XmlReader.Create(fs)) //AL6-Player2/2-PlaylistSrlz.//
-                {
-                    song = (T)xs.Deserialize(rdr); //AL6-Player2/2-PlaylistSrlz.//
-                }
-            }
-            return song; //AL6-Player2/2-PlaylistSrlz.//
-        }
-        public void LoadPlayList(string directoryPath) //AL6-Player2/2-PlaylistSrlz.//
-        {
+        public abstract void SavePlaylist(string directory);
 
-            XmlSerializer xs = new XmlSerializer(typeof(T)); //AL6-Player2/2-PlaylistSrlz.//
-            DirectoryInfo dir = new DirectoryInfo(directoryPath); //AL6-Player2/2-PlaylistSrlz.//
-            FileInfo[] files = dir.GetFiles("*.xml*");  //AL6-Player2/2-PlaylistSrlz.//
-            List<T> listOfLoadedSongs = new List<T>(); //AL6-Player2/2-PlaylistSrlz.
-            T song=null; //AL6-Player2/2-PlaylistSrlz.//
-            foreach (FileInfo item in files) //AL6-Player2/2-PlaylistSrlz.//
-            {
-                try //AL6-Player2/2-PlaylistSrlz.//
-                {
-                    
-                         song = DeserializeClass(item, xs); //AL6-Player2/2-PlaylistSrlz.//
-
-                }
-                catch (FileNotFoundException) //AL6-Player2/2-PlaylistSrlz.//
-                {
-                    Console.WriteLine("File has not found"); //AL6-Player2/2-PlaylistSrlz.//
-                }
-                 listOfLoadedSongs.Add(song); //AL6-Player2/2-PlaylistSrlz.//
-            }
-            Items = listOfLoadedSongs; //AL6-Player2/2-PlaylistSrlz.//
-        }
+        public abstract void LoadPlayList(string directoryPath, string pattern = null);
+       
     }
 }
