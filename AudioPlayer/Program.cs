@@ -53,7 +53,7 @@ namespace Audioplayer
 
             Console.WriteLine("Clear2    " + player.Items.Count); // show 0//
             player.Load(@"D:\ДЗ\playerload\audio\wav");
-            Console.WriteLine("load wav" + player.Items.Count); // show 1//
+            Console.WriteLine("load wav" + player.Items[0].Path); // show 1//
             
 
 

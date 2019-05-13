@@ -183,7 +183,7 @@ namespace AudioPlayer
                 }
             }
         }
-        public abstract void Load(string dirpath);
+        public abstract void Load(string dirpath, string pattern = null);
         public abstract void Clear();
 
         public abstract void SavePlaylist(string directory);

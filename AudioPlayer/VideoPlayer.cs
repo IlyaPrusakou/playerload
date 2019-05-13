@@ -24,7 +24,7 @@ namespace AudioPlayer
             throw new NotImplementedException();
         }
 
-        public override void Load(string dirpath)
+        public override void Load(string dirpath, string pattern = null)
         {
             throw new NotImplementedException();
         }

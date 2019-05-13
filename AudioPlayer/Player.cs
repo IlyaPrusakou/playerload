@@ -30,7 +30,7 @@ namespace Audioplayer
             else if (pattern != null) { files = dir.GetFiles(pattern); }
             return files; //AL6-Player1/2-AudioFiles.//
         }
-         public override void Load(string directoryPath) //AL6-Player1/2-AudioFiles.//
+         public override void Load(string directoryPath, string pattern = null) //AL6-Player1/2-AudioFiles.//
         {
             List<Song> listOfLoadedSongs = new List<Song>(); //AL6-Player1/2-AudioFiles.//
             FileInfo[] files = GetWav(directoryPath); //AL6-Player1/2-AudioFiles.//
