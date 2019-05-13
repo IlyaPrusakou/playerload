@@ -38,20 +38,22 @@ namespace Audioplayer
                 if (i == 3 || i == 7 || i == 23) { player.Items[i].LikeMethod(); }  
                 if (i == 5 || i == 8 || i == 22 || i == 21) { player.Items[i].DislikeMethod(); } 
             }
+
             player.Items[0].playlists.Add(new Playlist { title = "kuku" });
             player.Items[0].playlists.Add(new Playlist { title = "gaga" });
-            player.Save(@"D:\ДЗ\playerload\audio"); // работает как надо
-            Console.WriteLine(player.Items.Count); // show 25
+            //все отлично работает//
+            player.Save(@"D:\ДЗ\playerload\audio"); // работает как надо//
+            Console.WriteLine(player.Items.Count); // show 25//
             player.Clear();
 
-            Console.WriteLine("Clear    " + player.Items.Count); // show 0
+            Console.WriteLine("Clear    " + player.Items.Count); // show 0//
             player.LoadPlayList(@"D:\ДЗ\playerload\audio");
-            Console.WriteLine("Load    " + player.Items.Count); // show again 25
+            Console.WriteLine("Load    " + player.Items.Count); // show again 25//
             player.Clear();
 
-            Console.WriteLine("Clear2    " + player.Items.Count); // show 0
+            Console.WriteLine("Clear2    " + player.Items.Count); // show 0//
             player.Load(@"D:\ДЗ\playerload\audio\wav");
-            Console.WriteLine("load wav" + player.Items.Count); // show 1
+            Console.WriteLine("load wav" + player.Items.Count); // show 1//
             
 
 

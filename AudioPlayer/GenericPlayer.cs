@@ -183,105 +183,114 @@ namespace AudioPlayer
                 }
             }
         }
+        // Комментарий: я хотел сделать метод load обобщенным, но надо создавать песню T song = new T(), 
+        //следовательно надо делать ограничение для типа Т new(). Но тип Т имеет ограничение на конкретный тип
+        // ItemPlaying(это Абстарктный тип и не может иметь конструктор без параметров).//
+        // Следовательно я отправил метод load в класс Song: ItemPlaying
+        // (то есть разделил логику, выглядит неуклюже).//
+        // Можно было сделать класс ItemPlaying не абстрактным, но это противоречит нашим предыдущим заданиям.
+        // Можно в классе GenericPlayer<Т> оставить из метода load загрузку байтмассива и в класс
+        // Player: GenericPlayer<Song> создать метод CreateSong, внутри которого вызывать метода Load.
+        // Ниже привожу обобщенный вариант метода Load. Обратите внимание на строчку 213//
         //private FileInfo[] GetWav(string directoryPath)
         //{
-            //DirectoryInfo dir = new DirectoryInfo(directoryPath);
-            //FileInfo[] files = dir.GetFiles();
-            //return files;
+        //DirectoryInfo dir = new DirectoryInfo(directoryPath);
+        //FileInfo[] files = dir.GetFiles();
+        //return files;
         //}
         //private byte[] CreateByteFromWav(long lengtOfStream)
         //{
-            //byte[] bytemass = new byte[lengtOfStream];
-            //return bytemass;
+        //byte[] bytemass = new byte[lengtOfStream];
+        //return bytemass;
         //}
         //public void Load(string directoryPath)
         //{
-            //List<T> listOfLoadedSongs = new List<T>();
-            //FileInfo[] files = GetWav(directoryPath);
-            //foreach (FileInfo item in files)
-            //{
+        //List<T> listOfLoadedSongs = new List<T>();
+        //FileInfo[] files = GetWav(directoryPath);
+        //foreach (FileInfo item in files)
+        //{
 
-                //T itemSong = new T();
-                //try
-                //{
-                    //using (FileStream fs = new FileStream(item.FullName, FileMode.Open))
-                    //{
-                        //byte[] bytemass = CreateByteFromWav(fs.Length);
-                        //int len = Convert.ToInt32(bytemass.Length);
-                        //fs.Read(bytemass, 0, len);
-                        //itemSong.ItemByteData = bytemass;
-                    //}
-                //}
-                //catch (FileNotFoundException)
-                //{
-                   // Console.WriteLine("File has not found");
-                //}
-                //if (itemSong.ItemByteData.Length > 0) { listOfLoadedSongs.Add(itemSong); }
-            //}
-            //Items = listOfLoadedSongs;
+        //T itemSong = new T(); ЗДЕСЬ НУЖНО ВВОДИТЬ ОГРАНИЧЕНИЕ НА NEW()!!!
+        //try
+        //{
+        //using (FileStream fs = new FileStream(item.FullName, FileMode.Open))
+        //{
+        //byte[] bytemass = CreateByteFromWav(fs.Length);
+        //int len = Convert.ToInt32(bytemass.Length);
+        //fs.Read(bytemass, 0, len);
+        //itemSong.ItemByteData = bytemass;
         //}
-        public void Clear()
+        //}
+        //catch (FileNotFoundException)
+        //{
+        // Console.WriteLine("File has not found");
+        //}
+        //if (itemSong.ItemByteData.Length > 0) { listOfLoadedSongs.Add(itemSong); }
+        //}
+        //Items = listOfLoadedSongs;
+        //}//
+        public void Clear() //AL6-Player1/2-AudioFiles.//
         {
-            List<T> emptyList = new List<T>();
-            Items = emptyList;
+            List<T> emptyList = new List<T>(); //AL6-Player1/2-AudioFiles.//
+            Items = emptyList; //AL6-Player1/2-AudioFiles.//
         }
-        private void SerializeClass(T item, string filepath, XmlSerializer xs, XmlWriterSettings set)
+        private void SerializeClass(T item, string filepath, XmlSerializer xs, XmlWriterSettings set) //AL6-Player2/2-PlaylistSrlz.
         {
-                using (FileStream fs = File.Create(filepath))
+            using (FileStream fs = File.Create(filepath))//AL6-Player2/2-PlaylistSrlz.//
+            {
+                     using (XmlWriter str =  XmlWriter.Create(fs, set))//AL6-Player2/2-PlaylistSrlz.
                 {
-                     using (XmlWriter str =  XmlWriter.Create(fs, set))
-                    {
-                        xs.Serialize(str, item);
-                    }
+                        xs.Serialize(str, item);//AL6-Player2/2-PlaylistSrlz.//
                 }
+            }
         }
         
-        public void Save(string directory)
+        public void Save(string directory) //AL6-Player2/2-PlaylistSrlz.//
         {
-            XmlSerializer xs = new XmlSerializer(typeof(T));
-            XmlWriterSettings set = new XmlWriterSettings();
-            set.Indent = true;
-            foreach (T item in Items)
+            XmlSerializer xs = new XmlSerializer(typeof(T)); //AL6-Player2/2-PlaylistSrlz.//
+            XmlWriterSettings set = new XmlWriterSettings(); //AL6-Player2/2-PlaylistSrlz.//
+            set.Indent = true; //AL6-Player2/2-PlaylistSrlz.//
+            foreach (T item in Items) //AL6-Player2/2-PlaylistSrlz.//
             {
-                string filepath = directory + @"\" + item.Title + ".xml";
-                SerializeClass(item, filepath, xs, set);
+                string filepath = directory + @"\" + item.Title + ".xml"; //AL6-Player2/2-PlaylistSrlz.//
+                SerializeClass(item, filepath, xs, set); //AL6-Player2/2-PlaylistSrlz.//
             }
         }
-        private T DeserializeClass(FileInfo file, XmlSerializer xs)
+        private T DeserializeClass(FileInfo file, XmlSerializer xs) //AL6-Player2/2-PlaylistSrlz.//
         {
-            T song;
-            using (FileStream fs = new FileStream(file.FullName, FileMode.Open))
+            T song; //AL6-Player2/2-PlaylistSrlz.
+            using (FileStream fs = new FileStream(file.FullName, FileMode.Open)) //AL6-Player2/2-PlaylistSrlz.
             {
-                using (XmlReader rdr = XmlReader.Create(fs))
+                using (XmlReader rdr = XmlReader.Create(fs)) //AL6-Player2/2-PlaylistSrlz.//
                 {
-                    song = (T)xs.Deserialize(rdr);
+                    song = (T)xs.Deserialize(rdr); //AL6-Player2/2-PlaylistSrlz.//
                 }
             }
-            return song;
+            return song; //AL6-Player2/2-PlaylistSrlz.//
         }
-        public void LoadPlayList(string directoryPath)
+        public void LoadPlayList(string directoryPath) //AL6-Player2/2-PlaylistSrlz.//
         {
 
-            XmlSerializer xs = new XmlSerializer(typeof(T));
-            DirectoryInfo dir = new DirectoryInfo(directoryPath);
-            FileInfo[] files = dir.GetFiles("*.xml*"); // надо еще проверить
-            List<T> listOfLoadedSongs = new List<T>();
-            T song=null;
-            foreach (FileInfo item in files)
+            XmlSerializer xs = new XmlSerializer(typeof(T)); //AL6-Player2/2-PlaylistSrlz.//
+            DirectoryInfo dir = new DirectoryInfo(directoryPath); //AL6-Player2/2-PlaylistSrlz.//
+            FileInfo[] files = dir.GetFiles("*.xml*");  //AL6-Player2/2-PlaylistSrlz.//
+            List<T> listOfLoadedSongs = new List<T>(); //AL6-Player2/2-PlaylistSrlz.
+            T song=null; //AL6-Player2/2-PlaylistSrlz.//
+            foreach (FileInfo item in files) //AL6-Player2/2-PlaylistSrlz.//
             {
-                try
+                try //AL6-Player2/2-PlaylistSrlz.//
                 {
                     
-                         song = DeserializeClass(item, xs);
-                    
+                         song = DeserializeClass(item, xs); //AL6-Player2/2-PlaylistSrlz.//
+
                 }
-                catch (FileNotFoundException)
+                catch (FileNotFoundException) //AL6-Player2/2-PlaylistSrlz.//
                 {
-                    Console.WriteLine("File has not found");
+                    Console.WriteLine("File has not found"); //AL6-Player2/2-PlaylistSrlz.//
                 }
-                 listOfLoadedSongs.Add(song);
+                 listOfLoadedSongs.Add(song); //AL6-Player2/2-PlaylistSrlz.//
             }
-            Items = listOfLoadedSongs;
+            Items = listOfLoadedSongs; //AL6-Player2/2-PlaylistSrlz.//
         }
     }
 }
