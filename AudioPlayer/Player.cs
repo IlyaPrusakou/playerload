@@ -12,13 +12,13 @@ using System.Media;
 
 namespace Audioplayer
 {
-    public class Player: GenericPlayer<Song>, IDisposable  
+    public class Player: GenericPlayer<Song>, IDisposable  //
     {
-        private bool disposed = false;
-        private SoundPlayer soundplayer;
+        private bool disposed = false;//
+        private SoundPlayer soundplayer; //
         public Player()
         {
-            soundplayer = new SoundPlayer(); // это надо сократить
+            soundplayer = new SoundPlayer(); 
         }
 
         public Player(Skin skn)
@@ -26,27 +26,27 @@ namespace Audioplayer
             soundplayer = new SoundPlayer(); 
             SkinForm = skn;
         }
-        public override void Play(bool Loop = false)
+        public override void Play(bool Loop = false)//
         {
-            int counter = 0;
-            if (Loop == false)
+            
+            if (Loop == false)//
             {
-                ShufleExtension.ExtenShufle(Items);
+                ShufleExtension.ExtenShufle(Items);//
             }
-            else
+            else//
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 5; i++)//
                 {
-                    ShufleExtension.ExtenShufle(Items);
+                    ShufleExtension.ExtenShufle(Items);//
                 }
             }
-            if (Playing == true)
+            if (Playing == true)//
             {
-                foreach (Song song in Items)
+                foreach (Song song in Items)//
                 {
-                    soundplayer.SoundLocation = song.Path;
-                    soundplayer.Load();
-                    soundplayer.PlaySync();
+                    soundplayer.SoundLocation = song.Path;//
+                    soundplayer.Load();//
+                    soundplayer.PlaySync();//
                 }
             }
         }
@@ -116,27 +116,28 @@ namespace Audioplayer
                 SkinForm.Render($"{item.Title} --- {item.Lyrics}"); 
             }
         }
-        public void Dispose()
+        public void Dispose()//
         {
-            DisposeAlgo(true);
-            GC.SuppressFinalize(this);
+            DisposeAlgo(true);//
+            GC.SuppressFinalize(this);//
         }
-        protected virtual void DisposeAlgo(bool disposing)
+        protected virtual void DisposeAlgo(bool disposing)//
         {
-            if (!disposed)
+            if (!disposed)//
             {
-                if (disposing)
+                if (disposing)//
                 {
-                    soundplayer = null;
-                    Rnd = null;
-                    SkinForm = null;
+                    Items = null;//
+                    soundplayer = null;//
+                    Rnd = null;//
+                    SkinForm = null;//
                 }
-                disposed = true;
+                disposed = true;//
             }
         }
-        ~Player()
+        ~Player()//
         {
-            DisposeAlgo(false);
+            DisposeAlgo(false);//
         }
     }
 }
