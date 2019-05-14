@@ -42,13 +42,14 @@ namespace Audioplayer
             player.Items[0].playlists.Add(new Playlist { title = "kuku" });
             player.Items[0].playlists.Add(new Playlist { title = "gaga" });
             //все отлично работает//
-            player.SavePlaylist(@"D:\ДЗ\playerload\audio"); // работает как надо//
+            player.SavePlaylist(@"D:\ДЗ\playerload\audio", "Playlist"); // работает как надо//
             Console.WriteLine(player.Items.Count); // show 25//
             player.Clear();
 
             Console.WriteLine("Clear    " + player.Items.Count); // show 0//
-            player.LoadPlayList(@"D:\ДЗ\playerload\audio");
+            player.LoadPlayList(@"D:\ДЗ\playerload\audio\Playlist.xml");
             Console.WriteLine("Load    " + player.Items.Count); // show again 25//
+            Console.WriteLine(player.Items[0].playlists[0].title);
             player.Clear();
 
             Console.WriteLine("Clear2    " + player.Items.Count); // show 0//

@@ -186,9 +186,9 @@ namespace AudioPlayer
         public abstract void Load(string dirpath, string pattern = null);
         public abstract void Clear();
 
-        public abstract void SavePlaylist(string directory);
+        public abstract void SavePlaylist(string directory, string name);
 
-        public abstract void LoadPlayList(string directoryPath, string pattern = null);
+        public abstract void LoadPlayList(string filePath);
        
     }
 }

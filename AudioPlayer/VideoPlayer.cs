@@ -29,12 +29,12 @@ namespace AudioPlayer
             throw new NotImplementedException();
         }
 
-        public override void LoadPlayList(string directoryPath, string pattern = null)
+        public override void LoadPlayList(string directoryPath)
         {
             throw new NotImplementedException();
         }
 
-        public override void SavePlaylist(string directory)
+        public override void SavePlaylist(string directory, string name)
         {
             throw new NotImplementedException();
         }
