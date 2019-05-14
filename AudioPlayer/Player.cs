@@ -8,23 +8,52 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
 using AudioPlayer;
+using System.Media;
 
 namespace Audioplayer
 {
-    public class Player: GenericPlayer<Song>  
+    public class Player: GenericPlayer<Song>, IDisposable  
     {
+        private bool disposed = false;
+        private SoundPlayer soundplayer;
         public Player()
         {
-
+            soundplayer = new SoundPlayer(); // это надо сократить
         }
 
         public Player(Skin skn)
         {
-        SkinForm = skn;
+            soundplayer = new SoundPlayer(); 
+            SkinForm = skn;
         }
-        private FileInfo[] GetWav(string directoryPath, string pattern = null) //AL6-Player1/2-AudioFiles.//
+        public override void Play(bool Loop = false)
         {
-            DirectoryInfo dir = new DirectoryInfo(directoryPath); //AL6-Player1/2-AudioFiles.//
+            int counter = 0;
+            if (Loop == false)
+            {
+                ShufleExtension.ExtenShufle(Items);
+            }
+            else
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    ShufleExtension.ExtenShufle(Items);
+                }
+            }
+            if (Playing == true)
+            {
+                foreach (Song song in Items)
+                {
+                    soundplayer.SoundLocation = song.Path;
+                    soundplayer.Load();
+                    soundplayer.PlaySync();
+                }
+            }
+        }
+
+        private FileInfo[] GetWav(string directoryPath, string pattern = null) 
+        {
+            DirectoryInfo dir = new DirectoryInfo(directoryPath); 
             FileInfo[] files = null;
             if (pattern == null) { files = dir.GetFiles(); }
             else if (pattern != null) { files = dir.GetFiles(pattern); }
@@ -86,6 +115,28 @@ namespace Audioplayer
             {
                 SkinForm.Render($"{item.Title} --- {item.Lyrics}"); 
             }
+        }
+        public void Dispose()
+        {
+            DisposeAlgo(true);
+            GC.SuppressFinalize(this);
+        }
+        protected virtual void DisposeAlgo(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    soundplayer = null;
+                    Rnd = null;
+                    SkinForm = null;
+                }
+                disposed = true;
+            }
+        }
+        ~Player()
+        {
+            DisposeAlgo(false);
         }
     }
 }

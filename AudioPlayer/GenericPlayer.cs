@@ -35,6 +35,7 @@ namespace AudioPlayer
             {
                 return playing;
             }
+
         }
 
         public int Volume
