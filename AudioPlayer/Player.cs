@@ -128,15 +128,16 @@ namespace Audioplayer
                 if (disposing)//
                 {
                     Items = null;//
-                    soundplayer = null;//
                     Rnd = null;//
                     SkinForm = null;//
                 }
+                soundplayer.Dispose(); // таким образом он отработает если вызвали финализатор и явный диспоуз
                 disposed = true;//
             }
         }
         ~Player()//
         {
+           
             DisposeAlgo(false);//
         }
     }
