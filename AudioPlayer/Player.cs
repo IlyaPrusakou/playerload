@@ -42,13 +42,17 @@ namespace Audioplayer
             }
             if (Playing == true)//
             {
-                foreach (Song song in Items)//
+                for (int i = 0; i < Items.Count; i++)
                 {
-                    soundplayer.SoundLocation = song.Path;//
+                    
+                    Data = GetItemData(Items[i]);
+                    soundplayer.SoundLocationChanged += PlayNowItem;
+                    
+                    soundplayer.SoundLocation = Items[i].Path;//
                     soundplayer.Load();//
                     soundplayer.PlaySync();//
-                }
-            }
+                } 
+             }
         }
 
         private FileInfo[] GetWav(string directoryPath, string pattern = null) 
@@ -59,25 +63,28 @@ namespace Audioplayer
             else if (pattern != null) { files = dir.GetFiles(pattern); }
             return files; //AL6-Player1/2-AudioFiles.//
         }
-         public override void Load(string directoryPath, string pattern = null) //AL6-Player1/2-AudioFiles.//
+         public override void Load(string directoryPath, string pattern = null) 
         {
-            List<Song> listOfLoadedSongs = new List<Song>(); //AL6-Player1/2-AudioFiles.//
-            FileInfo[] files = GetWav(directoryPath); //AL6-Player1/2-AudioFiles.//
-            foreach (FileInfo item in files) //AL6-Player1/2-AudioFiles.//
+            List<Song> listOfLoadedSongs = new List<Song>(); 
+            FileInfo[] files = GetWav(directoryPath); 
+            foreach (FileInfo item in files) 
             {
-                Song itemSong = new Song();  //AL6-Player1/2-AudioFiles.//
+                Song itemSong = new Song();
+                
                 itemSong.Path = item.FullName;
-                listOfLoadedSongs.Add(itemSong); 
+                var audioFile = TagLib.File.Create(itemSong.Path);
+                itemSong.Title = audioFile.Tag.Title;
+                listOfLoadedSongs.Add(itemSong);
+                audioFile.Dispose();
             }
             Items = listOfLoadedSongs; 
         }
         public override void Clear()
         {
-            List<Song> emptyList = new List<Song>(); 
-            Items = emptyList; 
+             Items.Clear();
         }
         
-        public override void SavePlaylist(string directory, string name) //AL6-Player2/2-PlaylistSrlz.//
+        public override void SavePlaylist(string directory, string name) 
         {
             if (Items.Count != 0)
             {
@@ -95,7 +102,7 @@ namespace Audioplayer
             }
             else if (Items.Count == 0) { Console.WriteLine("Playlist is empty"); }
         }
-        public override void LoadPlayList(string filepath) //AL6-Player2/2-PlaylistSrlz.//
+        public override void LoadPlayList(string filepath) 
         {
 
             XmlSerializer xs = new XmlSerializer(typeof(List<Song>)); 
@@ -116,29 +123,29 @@ namespace Audioplayer
                 SkinForm.Render($"{item.Title} --- {item.Lyrics}"); 
             }
         }
-        public void Dispose()//
+        public void Dispose()
         {
-            DisposeAlgo(true);//
-            GC.SuppressFinalize(this);//
+            DisposeAlgo(true);
+            GC.SuppressFinalize(this);
         }
-        protected virtual void DisposeAlgo(bool disposing)//
+        protected virtual void DisposeAlgo(bool disposing)
         {
-            if (!disposed)//
+            if (!disposed)
             {
-                if (disposing)//
+                if (disposing)
                 {
-                    Items = null;//
-                    Rnd = null;//
-                    SkinForm = null;//
+                    Items = null;
+                    Rnd = null;
+                    SkinForm = null;
                 }
-                soundplayer.Dispose(); // таким образом он отработает если вызвали финализатор и явный диспоуз
-                disposed = true;//
+                soundplayer.Dispose(); 
+                disposed = true;
             }
         }
-        ~Player()//
+        ~Player()
         {
            
-            DisposeAlgo(false);//
+            DisposeAlgo(false);
         }
     }
 }

@@ -20,15 +20,20 @@ namespace AudioPlayer
         public List<T> Items { get; set; } // GenericPlayerHomework
         public Random Rnd { get; set; } = new Random();
         public Skin SkinForm { get; set; }
-        //public GenericPlayer()
-        //{
-
-        //}
-
-        //public GenericPlayer(Skin skn)
-        //{
-            //SkinForm = skn;
-        //}
+        public (string Title, bool IsNext, (int Sec, int Min, int Hour)) Data { get; set; }
+        // <Events>
+        public event Action PlayerStartedEvent;
+        public event Action PlayerStoppedEvent;
+        public event Action ItemStartedEvent; 
+        public event Action ItemListChangedEvent;
+        public event Action VolumeChangedEvent;
+        public event Action PlayerLockedEvent;
+        public event Action PlayerUnLockedEvent;
+        //<Events\>
+        public void PlayNowItem(object sender, EventArgs e)
+        {
+            ItemStartedEvent?.Invoke();
+        }
         public bool Playing
         {
             get
@@ -61,13 +66,7 @@ namespace AudioPlayer
             }
 
         }
-        public void ParametrSong(params T[] itemList) 
-        {
-            foreach (T item in itemList)
-            {
-                SkinForm.Render(item.Title); 
-            }
-        }
+        
         public (string Title, bool IsNext, (int Sec, int Min, int Hour)) GetItemData(T item)  
         {
             var (str, boo, sec, min, hour) = item;
@@ -78,20 +77,32 @@ namespace AudioPlayer
             int f2 = hour;
             return (Title: s, IsNext: d, (Sec: f, Min: f1, Hour: f2));
         }
-        public void ListItem(List<T> list) 
-        {
-            foreach (T item in list)
-            {
-                var tuple = GetItemData(item);
-                if (item.Like == true) { Console.ForegroundColor = ConsoleColor.Green; }
-                else if (item.Like == false) { Console.ForegroundColor = ConsoleColor.Red; }
-                else if (item.Like == null) { Console.ResetColor(); }
-                string paramertString = $"{tuple.Title}, {item.Genre} - {tuple.Item3.Hour}:{tuple.Item3.Min}:{tuple.Item3.Sec}";
-                string outputString = paramertString.StringSeparator();
-                SkinForm.Render(outputString); 
-            }
-        }
+        //public void ListItem(List<T> list) 
+        //{
+            //foreach (T item in list)
+            //{
 
+                //string paramertString = "";
+                //string outputString = "";
+                //var tuple = GetItemData(item);
+                //if (item.Like == true) { Console.ForegroundColor = ConsoleColor.Green; }
+                //else if (item.Like == false) { Console.ForegroundColor = ConsoleColor.Red; }
+                //else if (item.Like == null) { Console.ForegroundColor = ConsoleColor.Gray; }
+                //paramertString = $"{tuple.Title}, {item.Genre} - {tuple.Item3.Hour}:{tuple.Item3.Min}:{tuple.Item3.Sec}";
+                //if (Data.Title != null && Data.Title == item.Title)
+                //{
+
+                    //outputString = "!!!PLAY!!!" + paramertString.StringSeparator() + "!!!PLAY!!!";
+                //}
+                //else
+                //{
+                    //outputString = paramertString.StringSeparator();
+                //}
+                //SkinForm.Render(outputString);
+                //Console.ResetColor();
+            //}
+        //}
+        
         public List<T> FilterByGenres(List<T> items, Genres genre) 
         {
             List<T> FilterdList = new List<T>();
@@ -106,25 +117,28 @@ namespace AudioPlayer
         }
         public void VolumeUp()
         {
+            VolumeChangedEvent?.Invoke();
             Volume = Volume + 1;
-            SkinForm.Render($"Volume up {Volume}"); 
+           
 
         }
         public void VolumeDown()
         {
+            VolumeChangedEvent?.Invoke();
             Volume = Volume - 1;
-            SkinForm.Render("Volume " + Volume); 
+            
         }
         public void VolumeChange(int Step, string op)
         {
+            VolumeChangedEvent?.Invoke();
             if (op == "+")
             {
-                SkinForm.Render($"up volume {Step}"); 
+                
                 Volume = Volume + Step;
             }
             else if (op == "-")
             {
-                SkinForm.Render($"down volume {Step}"); 
+               
                 Volume = Volume - Step;
             }
         }
@@ -134,7 +148,8 @@ namespace AudioPlayer
         {
             if (IsLock == false)
             {
-                SkinForm.Render("Stop"); 
+                PlayerStoppedEvent?.Invoke();
+     
                 playing = false;
             }
             return playing;
@@ -143,7 +158,8 @@ namespace AudioPlayer
         {
             if (IsLock == false)
             {
-                SkinForm.Render("Start"); 
+                PlayerStartedEvent?.Invoke();
+           
                 playing = true;
             }
             return playing;
@@ -153,37 +169,18 @@ namespace AudioPlayer
         }
         public void Lock()
         {
-            SkinForm.Render("Player is locked"); 
+            PlayerLockedEvent?.Invoke();
+       
             IsLock = true;
         }
         public void UnLock()
         {
-            SkinForm.Render("Player is unlocked"); 
+            PlayerUnLockedEvent?.Invoke();
+         
             IsLock = false;
         }
-        public virtual void Play(bool Loop = false)
-        {
-            if (Loop == false)
-            {
-                ShufleExtension.ExtenShufle(Items);
-            }
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    ShufleExtension.ExtenShufle(Items); 
-                }
-            }
-            if (playing == true)
-            {
-                SkinForm.Render("to Play has started");
-                for (int i = 0; i < Items.Count; i++)
-                {
-                    SkinForm.Render(Items[i].Title);
-                    System.Threading.Thread.Sleep(2000);
-                }
-            }
-        }
+        public abstract void Play(bool Loop = false);
+        
         public abstract void Load(string dirpath, string pattern = null);
         public abstract void Clear();
 

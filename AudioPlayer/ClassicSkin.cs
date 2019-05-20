@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace AudioPlayer
 {
-    public class ClassicSkin : Skin //A.L2.Player1/1
+    public class ClassicSkin : Skin 
     {
-        public ClassicSkin() : base() //A.L2.Player1/1
+        public ClassicSkin() : base()
         {
 
         }
-        public override void Clear() //A.L2.Player1/1
+        public override void Clear() 
         {
-            Console.Clear(); //A.L2.Player1/1
+            Console.Clear(); 
         }
 
-        public override void Render(string str) //A.L2.Player1/1
+        public override void Render(string str) 
         {
-            string s = str; //A.L2.Player1/1
-            Console.ResetColor(); //A.L2.Player1/1
-            Console.WriteLine("><" + s + "><"); //A.L2.Player1/1
+            string s = str; 
+            Console.WriteLine("><" + s + "><"); 
         }
     }
 }

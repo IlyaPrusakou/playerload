@@ -20,14 +20,14 @@ namespace AudioPlayer
         public override void Clear() 
         {
             Console.Clear(); 
-            Console.WriteLine("All has been cleared"); 
+             
         }
 
         public override void Render(string str) 
         {
             string s = str; 
             Console.BackgroundColor = CnsClr; 
-            Console.ForegroundColor = ConsoleColor.DarkRed; 
+            
             Console.WriteLine(s); 
         }
     }

@@ -26,8 +26,8 @@ namespace AudioPlayer
         public bool IsNext { get; set; } // GenericPlayerHomework
         [XmlElement("Like")]
         public bool? Like { get; set; } // GenericPlayerHomework
-        [XmlElement("ItemByteData")]
-        public byte[] ItemByteData { get; set; }
+        
+        //public bool PlayNow { get; set; } = false;
 
         public ItemPlaying()
         {

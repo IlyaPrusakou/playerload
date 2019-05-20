@@ -18,7 +18,10 @@ namespace AudioPlayer
         {
             SkinForm = skn;
         }
+        public override void Play(bool param = false)
+        {
 
+        }
         public override void Clear()
         {
             throw new NotImplementedException();

@@ -20,26 +20,81 @@ namespace Audioplayer
     }
     class Program
     {
+        public static Player player = new Player();
+        public static void RenderSongList( Player player)
+        {
+            foreach (Song item in player.Items)
+            {
+
+                string paramertString = "";
+                string outputString = "";
+                var tuple = player.GetItemData(item);
+                if (item.Like == true) { Console.ForegroundColor = ConsoleColor.Green; }
+                else if (item.Like == false) { Console.ForegroundColor = ConsoleColor.Red; }
+                else if (item.Like == null) { Console.ForegroundColor = ConsoleColor.Gray; }
+                paramertString = $"{tuple.Title}, {item.Genre} - {tuple.Item3.Hour}:{tuple.Item3.Min}:{tuple.Item3.Sec}";
+                if (player.Data.Title != null && player.Data.Title == item.Title)
+                {
+
+                    outputString = "!!!PLAY!!!" + paramertString.StringSeparator() + "!!!PLAY!!!";
+                }
+                else
+                {
+                    outputString = paramertString.StringSeparator();
+                }
+                player.SkinForm.Render(outputString);
+                Console.ResetColor();
+            }
+        }
+        public static void Rerender()
+        {
+            string StatusBar;
+            string lockunlock = " ";
+            string playing = " ";
+            string title = " "; 
+            string volume = player.Volume.ToString();
+            if (player.IsLock == true) { lockunlock = "Player is locked"; }
+            else if (player.IsLock == false) { lockunlock = "Player is unlocked"; }
+            if (player.Playing == true) { playing = "Player is playing"; }
+            else if (player.Playing == false) { playing = "Player has stopped"; }
+            title = player.Data.Title;
+            StatusBar = lockunlock + " " + playing + " " + volume + "  " + title;
+            player.SkinForm.Clear();
+            player.SkinForm.Render(StatusBar);
+            RenderSongList(player);
+        }
 
         
         static void Main(string[] args)
         {
+            player.ItemListChangedEvent += Rerender;
+            player.ItemStartedEvent += Rerender;
+            player.PlayerLockedEvent += Rerender;
+            player.PlayerStartedEvent += Rerender;
+            player.PlayerStoppedEvent += Rerender;
+            player.PlayerUnLockedEvent += Rerender;
+            player.VolumeChangedEvent += Rerender;
+            
             ColorSkin ColorSkn = new ColorSkin(ConsoleColor.DarkYellow); 
-            ClassicSkin ClassicSkn = new ClassicSkin();  
-            Player player = new Player(ColorSkn); 
+            ClassicSkin ClassicSkn = new ClassicSkin();
+            //Player player = new Player(ColorSkn); 
+            player.SkinForm = ColorSkn;
             player.Items = new  List<Song>(); 
             
           
             player.Clear();
 
-            Console.WriteLine("Clear2    " + player.Items.Count); // show 0//
+            
             player.Load(@"D:\ДЗ\playerload\audio\wav");
-            Console.WriteLine("load wav" + player.Items.Count); // show 1//
-            foreach (var item in player.Items)
-            {
-                Console.WriteLine(item.Path);
-            }
+            player.Items[2].Like = true;
+            player.Items[3].Like = false;
+
             player.Play();
+            player.VolumeUp();
+            player.Play();
+            player.Lock();
+            player.Play();
+            player.UnLock();
 
             WriteLine("Now we try to use your keyboard");
 

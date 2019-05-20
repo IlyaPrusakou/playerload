@@ -11,10 +11,18 @@ namespace AudioPlayer
     {
         public static string StringSeparator(this string str)
         {
-            string sInsert = str.Insert(13, "^Nnn");
-            string[] separ = { "^Nnn" };
-            string[] sss = sInsert.Split(separ, StringSplitOptions.None);
-            string lastvar = sss[0] + "...";
+            string lastvar = " ";
+            try
+            {
+                string sInsert = str.Insert(13, "^Nnn");
+                string[] separ = { "^Nnn" };
+                string[] sss = sInsert.Split(separ, StringSplitOptions.None);
+                lastvar = sss[0] + "...";
+            }
+            catch (Exception ex)
+            {
+                lastvar = str;
+            }
             return lastvar;
         }
     }
