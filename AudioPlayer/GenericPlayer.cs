@@ -10,14 +10,14 @@ using System.Xml;
 
 namespace AudioPlayer
 {
-    public abstract class GenericPlayer<T>  where T: ItemPlaying // GenericPlayerHomework 
+    public abstract class GenericPlayer<T>  where T: ItemPlaying 
     {
         private int volume;
         private bool playing;
         public const int minVolume = 0;
         public const int maxVolume = 100;
         public bool IsLock { get; set; }
-        public List<T> Items { get; set; } // GenericPlayerHomework
+        public List<T> Items { get; set; } 
         public Random Rnd { get; set; } = new Random();
         public Skin SkinForm { get; set; }
         public (string Title, bool IsNext, (int Sec, int Min, int Hour)) Data { get; set; }
@@ -25,7 +25,6 @@ namespace AudioPlayer
         public event Action PlayerStartedEvent;
         public event Action PlayerStoppedEvent;
         public event Action ItemStartedEvent; 
-        public event Action ItemListChangedEvent;
         public event Action VolumeChangedEvent;
         public event Action PlayerLockedEvent;
         public event Action PlayerUnLockedEvent;

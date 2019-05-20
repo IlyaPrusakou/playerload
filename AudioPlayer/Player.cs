@@ -16,6 +16,7 @@ namespace Audioplayer
     {
         private bool disposed = false;//
         private SoundPlayer soundplayer; //
+        public event Action ItemListChangedEvent;
         public Player()
         {
             soundplayer = new SoundPlayer(); 
@@ -77,7 +78,8 @@ namespace Audioplayer
                 listOfLoadedSongs.Add(itemSong);
                 audioFile.Dispose();
             }
-            Items = listOfLoadedSongs; 
+            Items = listOfLoadedSongs;
+            ItemListChangedEvent?.Invoke();
         }
         public override void Clear()
         {
@@ -114,15 +116,16 @@ namespace Audioplayer
                     listOfLoadedSongs = (List<Song>)xs.Deserialize(str);
                 }
             }
-            Items = listOfLoadedSongs; 
+            Items = listOfLoadedSongs;
+            ItemListChangedEvent?.Invoke();
         }
-        public void LyricsOutput() 
-        {
-            foreach (Song item in Items) 
-            {
-                SkinForm.Render($"{item.Title} --- {item.Lyrics}"); 
-            }
-        }
+        //public void LyricsOutput() 
+        //{
+            //foreach (Song item in Items) 
+            //{
+                //SkinForm.Render($"{item.Title} --- {item.Lyrics}"); 
+            //}
+        //}
         public void Dispose()
         {
             DisposeAlgo(true);

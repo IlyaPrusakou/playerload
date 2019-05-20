@@ -74,7 +74,7 @@ namespace Audioplayer
             player.PlayerStoppedEvent += Rerender;
             player.PlayerUnLockedEvent += Rerender;
             player.VolumeChangedEvent += Rerender;
-            
+            player.ItemListChangedEvent += Rerender;
             ColorSkin ColorSkn = new ColorSkin(ConsoleColor.DarkYellow); 
             ClassicSkin ClassicSkn = new ClassicSkin();
             //Player player = new Player(ColorSkn); 
