@@ -63,26 +63,14 @@ namespace Audioplayer
             }
         }
 
-        private Task<bool?> InnerPlayAsync(CancellationToken token)
+        private Task InnerPlayAsync(CancellationToken token)
         {
+            return  Task.Run(() =>
+           {
+               soundplayer.Load();
+               soundplayer.PlaySync();
+           });
             
-            Task<bool?> task = new Task<bool?>(() =>
-            {
-                bool? Cancelled = null;
-                while (true)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        Cancelled = true;
-                        token.ThrowIfCancellationRequested();
-                    }
-                    soundplayer.Load();
-                    soundplayer.PlaySync();
-                    Cancelled = false;
-                }
-            }, token);
-            task.Start();
-            return task;
         }
         public async override Task PlayAsync(bool Loop = false)//
         {
@@ -108,8 +96,7 @@ namespace Audioplayer
                     Data = GetItemData(Items[i]);
                     soundplayer.SoundLocationChanged += PlayNowItem;
                     soundplayer.SoundLocation = Items[i].Path;
-                    bool? a = await Task.Run(() =>InnerPlayAsync(token), token);
-                    
+                    await InnerPlayAsync(token);
                 } 
              }
         }
