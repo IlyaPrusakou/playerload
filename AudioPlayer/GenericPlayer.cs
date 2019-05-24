@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Threading;
 
 namespace AudioPlayer
 {
     public abstract class GenericPlayer<T>  where T: ItemPlaying 
     {
+        public CancellationTokenSource source { get; set; }
+        public CancellationToken token { get; set; }
         private int volume;
         private bool playing;
         public const int minVolume = 0;
@@ -28,6 +31,7 @@ namespace AudioPlayer
         public event Action VolumeChangedEvent;
         public event Action PlayerLockedEvent;
         public event Action PlayerUnLockedEvent;
+        public event Action PlayCancelled;
         //<Events\>
         public void PlayNowItem(object sender, EventArgs e)
         {
@@ -116,20 +120,16 @@ namespace AudioPlayer
         }
         public void VolumeUp()
         {
-            VolumeChangedEvent?.Invoke();
             Volume = Volume + 1;
-           
-
+            VolumeChangedEvent?.Invoke();
         }
         public void VolumeDown()
         {
-            VolumeChangedEvent?.Invoke();
             Volume = Volume - 1;
-            
+            VolumeChangedEvent?.Invoke();
         }
         public void VolumeChange(int Step, string op)
         {
-            VolumeChangedEvent?.Invoke();
             if (op == "+")
             {
                 
@@ -140,6 +140,7 @@ namespace AudioPlayer
                
                 Volume = Volume - Step;
             }
+            VolumeChangedEvent?.Invoke();
         }
         
         
@@ -147,9 +148,9 @@ namespace AudioPlayer
         {
             if (IsLock == false)
             {
-                PlayerStoppedEvent?.Invoke();
-     
                 playing = false;
+                source.Cancel();
+                PlayerStoppedEvent?.Invoke();
             }
             return playing;
         }
@@ -157,9 +158,8 @@ namespace AudioPlayer
         {
             if (IsLock == false)
             {
-                PlayerStartedEvent?.Invoke();
-           
                 playing = true;
+                PlayerStartedEvent?.Invoke();
             }
             return playing;
         }
@@ -168,17 +168,16 @@ namespace AudioPlayer
         }
         public void Lock()
         {
-            PlayerLockedEvent?.Invoke();
-       
             IsLock = true;
+            PlayerLockedEvent?.Invoke();
         }
         public void UnLock()
         {
-            PlayerUnLockedEvent?.Invoke();
-         
             IsLock = false;
+            PlayerUnLockedEvent?.Invoke();
         }
         public abstract void Play(bool Loop = false);
+        public abstract Task PlayAsync(bool Loop = false);
         
         public abstract void Load(string dirpath, string pattern = null);
         public abstract void Clear();

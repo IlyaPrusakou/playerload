@@ -18,7 +18,11 @@ namespace AudioPlayer
         {
             SkinForm = skn;
         }
-        public override void Play(bool param = false)
+        public override void Play(bool Loop = false)
+        {
+
+        }
+        public async override Task PlayAsync(bool param = false)
         {
 
         }
