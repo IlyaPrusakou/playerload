@@ -169,6 +169,7 @@ namespace AudioPlayer
         public void Lock()
         {
             IsLock = true;
+            source.Cancel();
             PlayerLockedEvent?.Invoke();
         }
         public void UnLock()

@@ -63,14 +63,23 @@ namespace Audioplayer
             }
         }
 
-        private Task InnerPlayAsync(CancellationToken token)
+        private  Task InnerPlayAsync(CancellationToken token)
         {
-            return  Task.Run(() =>
+           
+           return Task.Run(() =>
            {
-               soundplayer.Load();
-               soundplayer.PlaySync();
-           });
-            
+               while (true)
+               {
+                   if (token.IsCancellationRequested)
+                   {
+                       soundplayer.Stop();
+                       return;
+                   }
+                   soundplayer.Load();
+                   soundplayer.PlaySync();
+               }
+           }, token);
+             
         }
         public async override Task PlayAsync(bool Loop = false)//
         {
@@ -91,29 +100,36 @@ namespace Audioplayer
                 
                 for (int i = 0; i < Items.Count; i++)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     source = new CancellationTokenSource();
                     token = source.Token;
                     Data = GetItemData(Items[i]);
                     soundplayer.SoundLocationChanged += PlayNowItem;
                     soundplayer.SoundLocation = Items[i].Path;
                     await InnerPlayAsync(token);
+                    source.Dispose();
+                    Console.WriteLine("ggggggg");
                 } 
              }
         }
-        public void CancelledTaskEvent()
-        {
-
-        }
+        
         private FileInfo[] GetWav(string directoryPath, string pattern = null) 
         {
             DirectoryInfo dir = new DirectoryInfo(directoryPath); 
             FileInfo[] files = null;
             if (pattern == null) { files = dir.GetFiles(); }
             else if (pattern != null) { files = dir.GetFiles(pattern); }
-            return files; //AL6-Player1/2-AudioFiles.//
+            return files; 
         }
          public override void Load(string directoryPath, string pattern = null) 
         {
+            if (token == null && token.IsCancellationRequested == false)
+            {
+                source.Cancel();
+            }
             List<Song> listOfLoadedSongs = new List<Song>(); 
             FileInfo[] files = GetWav(directoryPath); 
             foreach (FileInfo item in files) 
@@ -189,7 +205,8 @@ namespace Audioplayer
                     Rnd = null;
                     SkinForm = null;
                 }
-                soundplayer.Dispose(); 
+                soundplayer.Dispose();
+                source.Dispose();
                 disposed = true;
             }
         }
