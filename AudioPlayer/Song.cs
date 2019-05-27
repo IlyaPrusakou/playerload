@@ -13,6 +13,7 @@ namespace Audioplayer
         public Album Album { get; set; } // GenericPlayerHomework
         public Artist Artist { get; set; } // GenericPlayerHomework
         public GenericPlayer<Song> Player { get; set; } // GenericPlayerHomework
+        
 
         public Song()
         {

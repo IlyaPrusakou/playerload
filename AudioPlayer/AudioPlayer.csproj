@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="policy.2.0.taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\policy.2.0.taglib-sharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -42,6 +45,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="taglib-sharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Artist.cs" />
@@ -50,8 +56,11 @@
     <Compile Include="ClassicSkin.cs" />
     <Compile Include="ColorSkin.cs" />
     <Compile Include="Comparer.cs" />
+    <Compile Include="ConsoleContext.cs" />
+    <Compile Include="FailedToPlayException.cs" />
     <Compile Include="GenericPlayer.cs" />
     <Compile Include="ItemPlaying.cs" />
+    <Compile Include="PlayerException.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="Shuflext.cs" />
     <Compile Include="Skin.cs" />
@@ -65,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
