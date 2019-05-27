@@ -66,7 +66,22 @@ namespace Audioplayer
             title = player.Data.Title;
             if (player.token.IsCancellationRequested) { title = "Canceled"; }
             StatusBar = lockunlock + " " + playing + " " + volume + "  " + title; 
-            player.SkinForm.Clear(); 
+            player.SkinForm.Clear();
+            if (player.exceptionfield != null && player.token.IsCancellationRequested == false && player.Playing == true && player.IsLock == false)
+            {
+                if (player.exceptionfield.GetType() == typeof(PlayerException) || player.exceptionfield.GetType() == typeof(FailedToPlayException))
+                {
+                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(player.exceptionfield.Message);
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.WriteLine(player.exceptionfield.Message);
+                    Console.ResetColor();
+                }
+            }
             player.SkinForm.Render(StatusBar); 
             RenderSongList(player); 
             player.SkinForm.Render(commands); 
@@ -84,6 +99,9 @@ namespace Audioplayer
             player.PlayerUnLockedEvent += Visualizer;
             player.VolumeChangedEvent += Visualizer;
             player.ItemListChangedEvent += Visualizer;
+            player.OnError += Visualizer;
+            player.OnWarning += Visualizer;
+
             ColorSkin ColorSkn = new ColorSkin(ConsoleColor.DarkYellow); 
             ClassicSkin ClassicSkn = new ClassicSkin();
             player.SkinForm = ColorSkn;
@@ -91,7 +109,7 @@ namespace Audioplayer
             ConsoleContex syncContext = new ConsoleContex(); // стал медленнее работать
             Visualizer();
            
-            player.Load(@"D:\ДЗ\playerload\audio\wav");
+            //player.Load(@"D:\ДЗ\playerload\audio\wav");
             while (true)
             {
                 switch (ReadLine())

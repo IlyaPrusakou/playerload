@@ -10,15 +10,17 @@ using System.Xml;
 using AudioPlayer;
 using System.Media;
 using System.Threading;
-
+using System.Runtime.ExceptionServices;
 
 namespace Audioplayer
 {
-    public class Player: GenericPlayer<Song>, IDisposable 
+    public class Player : GenericPlayer<Song>, IDisposable
     {
         private bool disposed = false;
         private SoundPlayer soundplayer;
-       
+        public Exception exceptionfield { get; set; }
+        public event Action OnError;
+        public event Action OnWarning;
         public event Action ItemListChangedEvent;
         public Player()
         {
@@ -63,43 +65,69 @@ namespace Audioplayer
             }
         }
 
-        private  Task InnerPlayAsync(CancellationToken token)
+        private  void InnerPlay(CancellationToken token)
         {
-           
-           return Task.Run(() =>
-           {
-               while (true)
-               {
-                   if (token.IsCancellationRequested)
-                   {
-                       soundplayer.Stop();
-                       return;
-                   }
-                   soundplayer.Load();
-                   soundplayer.PlaySync();
-               }
-           }, token);
-             
+            if (token.IsCancellationRequested)
+            {
+                soundplayer.Stop();
+                return;
+            }
+            soundplayer.Load();
+            try
+            {
+                soundplayer.PlaySync();
+            }
+            //catch (FileNotFoundException fex)   AL5-Player1/2. ExceptionHandling.
+            //{
+            //exceptionfield = fex;   AL5-Player1/2. ExceptionHandling.
+            //OnError();   AL5-Player1/2. ExceptionHandling.
+            //}
+            //catch (InvalidOperationException iex)   AL5-Player1/2. ExceptionHandling.
+            //{
+            //exceptionfield = iex;   AL5-Player1/2. ExceptionHandling.
+            //OnError();   AL5-Player1/2. ExceptionHandling.
+            //}
+            catch (FileNotFoundException fex)    //AL5 - Player1 / 2.CustomExceptions.
+            {
+                //ExceptionDispatchInfo di = ExceptionDispatchInfo.Capture(new FailedToPlayException(soundplayer.SoundLocation, fex.StackTrace, fex.Message, fex));
+                //di.Throw();
+                throw new FailedToPlayException(soundplayer.SoundLocation, fex.StackTrace, fex.Message, fex);
+            }
+            catch (InvalidOperationException iex)    //AL5 - Player1 / 2.CustomExceptions.
+            {
+
+                ExceptionDispatchInfo di = ExceptionDispatchInfo.Capture(new FailedToPlayException(soundplayer.SoundLocation, iex.StackTrace, iex.Message, iex));
+                di.Throw();     //AL5 - Player1 / 2.CustomExceptions.
+                //throw new FailedToPlayException(soundplayer.SoundLocation, iex.StackTrace, iex.Message, iex);
+                //<summury>
+                // вот именно в месте повторной генерации исключения(строчка 100 или 101) исключение генерируется
+                // и приложение подает(то есть повторное исключение не обрабатывается!!!),
+                // хотя это исключение должно всплывать  на строчке 143 и обрабатываться try-catch основного потока.
+                // я прописал логику обработки исключения как будто исключение всплывает в основном потоке
+                // ввел события onerror и onwarning и изменил метод vizualizer в классе Programm
+            }
+
+            
         }
-        public async override Task PlayAsync(bool Loop = false)//
+        public async override Task PlayAsync(bool Loop = false)
         {
             
-            if (Loop == false)//
+            if (Loop == false)
             {
-                ShufleExtension.ExtenShufle(Items);//
+                ShufleExtension.ExtenShufle(Items);
             }
-            else//
+            else
             {
-                for (int i = 0; i < 5; i++)//
+                for (int i = 0; i < 5; i++)
                 {
-                    ShufleExtension.ExtenShufle(Items);//
+                    ShufleExtension.ExtenShufle(Items);
                 }
             }
-            if (Playing == true)//
+            if (Playing == true)
             {
-                
                 for (int i = 0; i < Items.Count; i++)
                 {
+                    
                     if (token.IsCancellationRequested)
                     {
                         return;
@@ -109,9 +137,23 @@ namespace Audioplayer
                     Data = GetItemData(Items[i]);
                     soundplayer.SoundLocationChanged += PlayNowItem;
                     soundplayer.SoundLocation = Items[i].Path;
-                    await InnerPlayAsync(token);
+                    Task task = Task.Run(() => InnerPlay(token),token);
+                    try    //AL5 - Player1 / 2.CustomExceptions.
+                    {
+                        await task;
+                    }
+                    catch (PlayerException pex)    //AL5 - Player1 / 2.CustomExceptions.
+                    {
+                        exceptionfield = pex;
+                        OnWarning();
+                    }
+                    catch (Exception ex)    //AL5 - Player1 / 2.CustomExceptions.
+                    {
+                        exceptionfield = ex;
+                        OnError();
+                    }
                     source.Dispose();
-                    Console.WriteLine("ggggggg");
+                    exceptionfield = null;
                 } 
              }
         }
@@ -128,6 +170,7 @@ namespace Audioplayer
         {
             if (token == null && token.IsCancellationRequested == false)
             {
+                //soundplayer.Stop();
                 source.Cancel();
             }
             List<Song> listOfLoadedSongs = new List<Song>(); 

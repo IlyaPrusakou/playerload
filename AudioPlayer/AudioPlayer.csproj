@@ -57,8 +57,10 @@
     <Compile Include="ColorSkin.cs" />
     <Compile Include="Comparer.cs" />
     <Compile Include="ConsoleContext.cs" />
+    <Compile Include="FailedToPlayException.cs" />
     <Compile Include="GenericPlayer.cs" />
     <Compile Include="ItemPlaying.cs" />
+    <Compile Include="PlayerException.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="Shuflext.cs" />
     <Compile Include="Skin.cs" />
